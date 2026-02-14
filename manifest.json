@@ -2,6 +2,14 @@
   "manifest_version": 2,
   "name": "Amnesia",
   "version": "1.1",
+  "browser_specific_settings": {
+    "gecko": {
+        "id": "@laurentsarrazin.amnesia",
+        "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
   "description": "Analyse des liens et historique Firefox.",
   "permissions": [
     "history",

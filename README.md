@@ -27,7 +27,13 @@ and select `manifest.json` file
 
 ## Packaging
 
-Using `web-ext`:
+### Hand-made:
+```
+zip -r -FS ../amnesia.xpi * --exclude '*.git*' --exclude '*.md'
+```
+and submit the extension to Firefox AMO
+
+### Using `web-ext`:
 
 from extension code folder
 ```
