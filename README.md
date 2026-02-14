@@ -1,4 +1,4 @@
-# Amnesia
+# !(/icon64.png) Amnesia
 
 Firefox extension to fetch page links, then display last visit date and number of views.
 
@@ -29,10 +29,10 @@ and select `manifest.json` file
 Using `web-ext`:
 
 from extension code folder
-`
+```
 web-ext build
 web-ext sign
-`
+```
 
 This will produce the extension `.xpi` file.
 
