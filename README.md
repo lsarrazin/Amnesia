@@ -1,4 +1,5 @@
-# !(/icon64.png) Amnesia
+
+# Amnesia ![Amnsia](/icon32.png) 
 
 Firefox extension to fetch page links, then display last visit date and number of views.
 
