@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Préférences - Amnesia</title>
+<title>Preferences - Amnesia</title>
 <style>
 body { font-family: Arial; padding: 20px; max-width: 900px; }
 textarea { width: 100%; height: 120px; margin-bottom: 15px; }
@@ -15,15 +15,15 @@ small { color: #666; }
 </head>
 <body>
 
-<h2>Filtres RegExp</h2>
+<h2>RegExp Filters</h2>
 
 <div class="section">
   <h3>Whitelist (inclusion)</h3>
-  <small>Si au moins une regex est définie ici, seules les URLs correspondantes seront conservées.</small>
+  <small>If at least one regex is defined here, only matching URLs will be kept.</small>
   <textarea id="whitelist"></textarea>
 
   <div class="example">
-Exemples :<br>
+Examples:<br>
 ^https://example\.com<br>
 /articles/<br>
 \.pdf$<br>
@@ -33,11 +33,11 @@ Exemples :<br>
 
 <div class="section">
   <h3>Blacklist (exclusion)</h3>
-  <small>Les URLs correspondant à ces regex seront supprimées après application de la whitelist.</small>
+  <small>URLs matching these regexes will be excluded after applying the whitelist.</small>
   <textarea id="blacklist"></textarea>
 
   <div class="example">
-Exemples :<br>
+Examples:<br>
 \?utm_<br>
 #<br>
 /logout<br>
@@ -46,8 +46,36 @@ Exemples :<br>
   </div>
 </div>
 
-<button id="save">Enregistrer</button>
-<div id="status"></div>
+<div class="section">
+  <label>
+    <input type="checkbox" id="inheritVisits">
+    Apply a child URL's visit date to the queried URL
+  </label>
+  <div class="example">
+    If checked, when an exact URL is not found but a URL in its sub-path is found,
+    the child URL's visit date will be used for the queried URL.
+  </div>
+</div>
+
+<div class="section">
+  <label for="localeSelect">Language</label>
+  <select id="localeSelect">
+    <option value="en">English</option>
+    <option value="fr">Français</option>
+    <option value="es">Español</option>
+    <option value="de">Deutsch</option>
+  </select>
+  <div class="example">
+    Select the UI language for the popup display.
+  </div>
+</div>
+
+
+<div class="section">
+    <button id="save">Save</button>
+  <button id="resetStats" style="margin-left:8px">Reset statistics</button>
+    <div id="status"></div>
+</div>
 
 <script src="options.js"></script>
 

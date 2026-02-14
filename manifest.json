@@ -1,16 +1,18 @@
 {
   "manifest_version": 2,
   "name": "Amnesia",
-  "version": "1.1",
+  "version": "1.2",
+  "author": "Laurent Sarrazin",
+  "homepage_url": "https://github.com/lsarrazin/amnesia",
   "browser_specific_settings": {
     "gecko": {
-        "id": "@laurentsarrazin.amnesia",
+        "id": "@github.com.lsarrazin.amnesia",
         "data_collection_permissions": {
         "required": ["none"]
       }
     }
   },
-  "description": "Analyse des liens et historique Firefox.",
+  "description": "Link analysis and Firefox history.",
   "permissions": [
     "history",
     "activeTab",
@@ -22,7 +24,7 @@
     "scripts": ["background.js"]
   },
   "browser_action": {
-    "default_title": "Inspect Link History"
+    "default_title": "Inspect Navigation History"
   },
   "options_ui": {
     "page": "options.html",
