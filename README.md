@@ -29,11 +29,11 @@ and select `manifest.json` file
 
 ### Hand-made:
 ```
-zip -r -FS ../amnesia.xpi * --exclude '*.git*' --exclude '*.md'
+zip -r -FS ../amnesia.xpi * --exclude '*.git*' --exclude '*.md' --exclude 'LICENSE'
 ```
 and submit the extension to Firefox AMO
 
-### Using `web-ext`:
+### Using `web-ext` (unverified):
 
 from extension code folder
 ```
