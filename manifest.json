@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Link History Inspector",
+  "version": "1.0",
+  "description": "Affiche l'historique Firefox des liens présents dans la page.",
+  "permissions": [
+    "history",
+    "activeTab",
+    "tabs",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_action": {
+    "default_title": "Inspect Link History"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
