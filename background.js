@@ -101,7 +101,7 @@ browser.runtime.onMessage.addListener(async (message) => {
         const stored = await browser.storage.local.get(["inheritVisits", "useCache", "urlsLimit"]);
         const inheritVisits = !!stored.inheritVisits;
         const useCache = !!stored.useCache;
-        const urlsLimit = !!stored.urlsLimit || 100;
+        const urlsLimit = stored.urlsLimit || 100;
 
         const urls = message.urls;
         if (urls.length <= urlsLimit) {
