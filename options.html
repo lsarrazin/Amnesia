@@ -7,7 +7,7 @@
 body { font-family: Arial; padding: 20px; max-width: 900px; }
 textarea { width: 100%; height: 120px; margin-bottom: 15px; }
 button { margin-top: 10px; }
-.section { margin-bottom: 30px; }
+.section { margin-bottom: 8px; }
 .example { background:#f5f5f5; padding:10px; border-radius:5px; font-family: monospace; }
 h3 { margin-bottom:5px; }
 small { color: #666; }
@@ -15,47 +15,7 @@ small { color: #666; }
 </head>
 <body>
 
-<h2>RegExp Filters</h2>
-
-<div class="section">
-  <h3>Whitelist (inclusion)</h3>
-  <small>If at least one regex is defined here, only matching URLs will be kept.</small>
-  <textarea id="whitelist"></textarea>
-
-  <div class="example">
-Examples:<br>
-^https://example\.com<br>
-/articles/<br>
-\.pdf$<br>
-^https://(www\.)?github\.com
-  </div>
-</div>
-
-<div class="section">
-  <h3>Blacklist (exclusion)</h3>
-  <small>URLs matching these regexes will be excluded after applying the whitelist.</small>
-  <textarea id="blacklist"></textarea>
-
-  <div class="example">
-Examples:<br>
-\?utm_<br>
-#<br>
-/logout<br>
-\.png$<br>
-\.jpg$
-  </div>
-</div>
-
-<div class="section">
-  <label>
-    <input type="checkbox" id="inheritVisits">
-    Apply a child URL's visit date to the queried URL
-  </label>
-  <div class="example">
-    If checked, when an exact URL is not found but a URL in its sub-path is found,
-    the child URL's visit date will be used for the queried URL.
-  </div>
-</div>
+<h3>Extension Language</h3>
 
 <div class="section">
   <label for="localeSelect">Language</label>
@@ -65,15 +25,83 @@ Examples:<br>
     <option value="es">Español</option>
     <option value="de">Deutsch</option>
   </select>
+  <small>
+  <br>Select the UI language for the popup display.
+  </small>
+</div>
+
+<h3>RegExp Filters</h3>
+
+<div class="section">
+  <label>Whitelist (inclusion)</label>
+  <small><br>If at least one regex is defined here, only matching URLs will be kept.</small>
+  <textarea id="whitelist"></textarea>
+  <small>Examples:</small>
   <div class="example">
-    Select the UI language for the popup display.
+^https://example\.com<br>
+/articles/<br>
+\.pdf$<br>
+^https://(www\.)?github\.com
   </div>
 </div>
 
+<div class="section">
+  <label>Blacklist (exclusion)</label>
+  <small><br>Any URL matching these regexes will be excluded after applying the whitelist.</small>
+  <textarea id="blacklist"></textarea>
+  <small>Examples:</small>
+  <div class="example">
+\?utm_<br>
+#<br>
+/logout<br>
+\.png$<br>
+\.jpg$
+  </div>
+</div>
+
+<h3>Other settings</h3>
+
+<div class="section">
+  <label>
+    Maximum number of links to query <input type="number" min="1" max="500" step="1" id="urlsLimit">
+  </label>
+  <small>
+    <br>This is the number of links that will be checked when bringing up the interface.
+    <br>The higher the number, the longer the check will last.
+  </small>
+</div>
+
+<div class="section">
+  <label>
+    <input type="checkbox" id="useCache">
+    Use session cache to speed up URL checking.
+    <br>Limit cache size to <input type="number" min="100" max="10000" step="100" id="maxCacheSize" disabled="true"> links.
+  </label>
+  <br>
+  <label>
+    Current cache size: <span id="cacheSize"></span>
+    <button id="clearCache" style="margin-left:16px" disabled="true">Clear cache</button>
+  </label>
+  <small>
+    <br>If checked, use local cache to speed up URL checking.
+    <br>Any examinated link is therefore searched within a local cache before querying browser history.
+  </small>
+</div>
+
+<div class="section">
+  <label>
+    <input type="checkbox" id="inheritVisits">
+    Apply a child URL's visit date to the queried URL
+  </label>
+  <small>
+    If checked, when an exact URL is not found but a URL in its sub-path is found,
+    the child URL's visit date will be used for the queried URL.
+  </small>
+</div>
 
 <div class="section">
     <button id="save">Save</button>
-  <button id="resetStats" style="margin-left:8px">Reset statistics</button>
+    <button id="resetStats" style="margin-left:8px">Reset statistics</button>
     <div id="status"></div>
 </div>
 

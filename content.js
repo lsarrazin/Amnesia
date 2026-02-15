@@ -297,6 +297,7 @@ async function createPopup() {
   info.style.fontSize = "14px";
   info.style.color = "#2563eb";
   info.style.textAlign = "center";
+  
   // compute average search duration from stored stats (ms)
   const stats = await browser.storage.local.get(["stats_totalSearchTimeMs", "stats_searchCount"]);
   const totalMs = Number(stats.stats_totalSearchTimeMs || 0);
