@@ -6,7 +6,7 @@
   "homepage_url": "https://github.com/lsarrazin/amnesia",
   "browser_specific_settings": {
     "gecko": {
-        "id": "@github.com.lsarrazin.amnesia",
+        "id": "@laurentsarrazin.amnesia",
         "data_collection_permissions": {
         "required": ["none"]
       }
