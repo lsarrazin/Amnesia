@@ -98,12 +98,13 @@ browser.runtime.onMessage.addListener(async (message) => {
         const searchStart = Date.now();
 
         // Charger préférence d'héritage des visites (par défaut false)
-        const stored = await browser.storage.local.get(["inheritVisits", "useCache", "urlsLimit"]);
-        const inheritVisits = !!stored.inheritVisits;
+        const stored = await browser.storage.local.get(["useCache", "urlsLimit"]);
         const useCache = !!stored.useCache;
         const urlsLimit = stored.urlsLimit || 100;
 
         const urls = message.urls;
+        const inheritVisits = message.inheritVisits;
+
         if (urls.length <= urlsLimit) {
 
             for (const url of urls) {

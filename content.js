@@ -4,20 +4,32 @@ browser.runtime.onMessage.addListener((message) => {
   }
 });
 
-async function createPopup() {
+// TODO: make this a common.js script
+const GLOBAL_KEY = "__global__";
 
-  // --------- Récupération préférences ---------
+// TODO: make this a common.js script
+function normalizeDomain(s) {
+  return (s || "").trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "");
+}
 
-  // --------- Récupération préférences ---------
 
-  const stored = await browser.storage.local.get([
-  "whitelist",
-  "blacklist",
-  "locale"
-  ]);
+async function getFilteringOptions() {
 
-  const whitelistRaw = stored.whitelist || [];
-  const blacklistRaw = stored.blacklist || [];
+  var rawDomain = document.location.hostname;
+
+  const domain = normalizeDomain(rawDomain);
+  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) {
+    console.error("Invalid domain name: " + rawDomain);
+    return {};
+  }
+
+  const all = await browser.storage.local.get("domains");
+  const map = all.domains || {};
+  const config = map[domain] || map[GLOBAL_KEY] || null;
+
+  const whitelistRaw = config.whitelist || [];
+  const blacklistRaw = config.blacklist || [];
+  const inheritVisits = config.inheritVisits || false;
 
   function compile(list) {
   return list.map(r => {
@@ -32,6 +44,15 @@ async function createPopup() {
   const whitelist = compile(whitelistRaw);
   const blacklist = compile(blacklistRaw);
 
+  return { whitelist: whitelist, blacklist: blacklist, inheritVisits: inheritVisits };
+}
+
+
+async function createPopup() {
+
+  const stored = await browser.storage.local.get("locale");
+
+  // --------- Récupération préférences ---------
   const locale = stored.locale || "en";
   const translations = {
     en: {
@@ -78,15 +99,16 @@ async function createPopup() {
   const t = translations[locale] || translations.en;
 
   // --------- Collecte + déduplication robuste ---------
-
   const links = Array.from(document.querySelectorAll("a[href]"))
     .map(a => new URL(a.href).toString());
 
   const uniqueLinks = [...new Set(links)];
 
   // --------- Filtrage double système ---------
-
   let filteredLinks = uniqueLinks;
+
+  // Load configuration from current document's infered domain
+  const { whitelist, blacklist, inheritVisits } = await getFilteringOptions();
 
   // Whitelist (si non vide)
   if (whitelist.length > 0) {
@@ -94,7 +116,6 @@ async function createPopup() {
       let res = false;
       for (const regex of whitelist) {
         if (regex.test(url)) {
-          console.log(url + " matched whitelisted regex:" + regex);
           res = true;
           break;
         }
@@ -109,7 +130,6 @@ async function createPopup() {
       let res = true;
       for (const regex of blacklist) {
         if (regex.test(url)) {
-          console.log(url + " matched blacklisted regex:" + regex);
           res = false;
           break;
         }
@@ -321,6 +341,7 @@ async function createPopup() {
 
   const historyData = await browser.runtime.sendMessage({
     type: "GET_HISTORY",
+    inheritVisits: inheritVisits,
     urls: filteredLinks
   });
 
