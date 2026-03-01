@@ -1,10 +1,9 @@
 browser.runtime.onMessage.addListener(async (message) => {
 
   if (message.command === "GET_PAGE_LINKS") {
-    return {
-      domain: getPageDomain(),
-      links: getPageLinks()
-    };
+    const links = getPageLinks();
+    const domain = getPageDomain();
+    return { domain: domain, links: links };
   }
   else if (message.command === "GET_FILTERED_LINKS") {
     return {

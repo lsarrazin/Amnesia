@@ -7,7 +7,7 @@ browser.browserAction.onClicked.addListener(async (tab) => {
         command: "POPUP_TRIGGERED",
         tabId: tab.id
     }).catch(err => {
-        console.error("Erreur envoi message:", err);
+        console.error("Exception on message send:", err);
     });
 
 });
@@ -18,7 +18,7 @@ browser.runtime.onMessage.addListener(async (message) => {
         const pageLinks = await browser.tabs.sendMessage(message.tabId, {
             command: "GET_PAGE_LINKS"
         }).catch(err => {
-            console.error("Erreur envoi message:", err);
+            console.error("Exception on message send:", err);
             return { domain: "", links: [] };
         });
 
@@ -55,7 +55,7 @@ browser.runtime.onMessage.addListener(async (message) => {
 
         const results = (urls.length <= urlsLimit) ?
             await getHistoryItems(urls, useCache, inheritVisits) :
-            await sampleHistoryItems(urls, urlsLimit);
+            await sampleHistoryItems(urls, inheritVisits);
 
         // persist timing stats: total time and count
         try {
@@ -70,10 +70,10 @@ browser.runtime.onMessage.addListener(async (message) => {
                 stats_searchCount: prevCount + 1
             });
         } catch (e) {
-            console.error("Erreur en sauvegarde des stats de recherche:", e);
+            console.error("Search statistics can not be saved:", e);
         }
 
-        return results;
+        return {historyMode: urls.length > urlsLimit ? "sample" : "full", historyItems: results};
     }
 
 });
@@ -127,12 +127,13 @@ async function getHistoryItems(urls, useCache, inheritVisits) {
             historyItems.some(item => {
                 lastVisitTime = item.lastVisitTime;
                 visitCount = item.visitCount;
-                if (useCache) updateCache(url, lastVisitTime, visitCount);
                 if (item.url === url) {
                     exactMatch = true;
+                    if (useCache) updateCache(url, lastVisitTime, visitCount);
                     return true;
                 } else if (inheritVisits && item.url.startsWith(url)) {
                     exactMatch = false;
+                    if (useCache) updateCache(url, lastVisitTime, visitCount);
                     return true;
                 } else {
                     return false;
@@ -206,11 +207,7 @@ async function sampleHistoryItems(urls, inheritVisits) {
  * @returns Links served by the active tab's content script
  */
 async function getActiveTabLinks(tabId) {
-    console.log("Getting active tab links...");
-
     const pageLinks = await browser.tabs.sendMessage(tabId, { command: "GET_PAGE_LINKS" });
-    console.log("Received page links:", pageLinks);
-
     return pageLinks;
 }
 
@@ -228,7 +225,7 @@ async function getFilteringOptions(domain) {
     const normalizedDomain = normalizeDomain(domain);
     if (!normalizedDomain || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(normalizedDomain)) {
         console.error("Invalid domain name: " + domain);
-        return {};
+        return { domain: "", whitelist: [], blacklist: [], inheritVisits: false};
     }
 
     const all = await browser.storage.local.get("domains");
@@ -263,6 +260,7 @@ async function getFilteringOptions(domain) {
  * @returns 
  */
 function filterHistoryLinks(links, options) {
+    if (links.length === 0) return [];
     return links.filter(url => {
         if (options.blacklist.some(regex => regex.test(url))) {
             return false;
@@ -288,7 +286,6 @@ browser.storage.local.set({ cacheSize: 0 });
 // Register history event handler to update cache on navigation
 if (useCache) {
     browser.history.onVisited.addListener((details) => {
-        console.log("Visited " + details.url);
         updateCache(details.url, details.lastVisitTime);
     });
 }

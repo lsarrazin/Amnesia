@@ -12,12 +12,18 @@ async function getHistory() {
     command: "GET_FILTERED_LINKS",
     tabId: tab.id
   });
+
   const inheritVisits = filtered.inheritVisits;
   const filteredLinks = filtered.filteredLinks;
-  const domain = filtered.domain || getPageDomain();
+  const domain = filtered.domain || "";
 
+  // Update header with domain
   const headerTitle = document.getElementById("header-title");
-  headerTitle.textContent = `Amnesia - remind ${domain}`;
+  if (domain === "") {
+    headerTitle.textContent = "Amnesia - active tab not supported";
+  } else {
+    headerTitle.textContent = `Amnesia - remembering ${domain}`;
+  }
 
   // compute average search duration from stored stats (ms)
   const stats = await browser.storage.local.get(["stats_totalSearchTimeMs", "stats_searchCount"]);
@@ -46,14 +52,20 @@ async function getHistory() {
     loaderText.textContent = `Recovering memory from ${filteredLinks.length} link${filteredLinks.length > 1 ? 's' : ''}… Estimated: ${remainingSeconds}s`;
   }, 250);
 
-  const historyData = await browser.runtime.sendMessage({
-    type: "GET_HISTORY",
-    inheritVisits: inheritVisits,
-    urls: filteredLinks
-  });
-
-  return historyData;
+  if (filteredLinks.length === 0) {
+    clearInterval(spinnerCountdownInterval);
+    loaderText.textContent = "No link to search through history.";
+    return {historyMode: "broken", historyItems: {}};
+  } else {
+    const historyData = await browser.runtime.sendMessage({
+      type: "GET_HISTORY",
+      inheritVisits: inheritVisits,
+      urls: filteredLinks
+    });
+    return historyData;
+  }
 }
+
 
 function formatDate(date) {
   const d = new Date(date);
@@ -61,7 +73,7 @@ function formatDate(date) {
 }
 
 
-function renderHistory(items, sortOrder) {
+function renderHistory(historyItems, sortOrder) {
   
   const sortOptions = {
     "UrlAsc": { field: "url", direction: 1 },
@@ -78,6 +90,9 @@ function renderHistory(items, sortOrder) {
     sortField = sortOptions[sortOrder].field;
     sortDirection = sortOptions[sortOrder].direction;
   }
+
+  const items = historyItems.historyItems || {};
+  const mode = historyItems.historyMode || "unknown";
 
   const data = [];
   for (const url of Object.keys(items)) {
@@ -124,21 +139,21 @@ function renderHistory(items, sortOrder) {
       a.textContent = item.url;
 
       const tdUrl = document.createElement("td");
-      tdUrl.style.width = "480px";
+      tdUrl.style.width = "60%";
       tdUrl.style.textAlign = "left";
       tdUrl.appendChild(a);
 
       const tdLast = document.createElement("td");
-      tdLast.style.width = "160px";
+      tdLast.style.width = "20%";
       tdLast.textContent = item.lastVisitTime ? formatDate(item.lastVisitTime) : "Never";
 
       const tdCount = document.createElement("td");
-      tdCount.style.width = "80px";
+      tdCount.style.width = "10%";
       tdCount.style.textAlign = "center";
       tdCount.textContent = String(item.visitCount);
 
       const tdExact = document.createElement("td");
-      tdExact.style.width = "80px";
+      tdExact.style.width = "10%";
       tdExact.style.textAlign = "center";
       tdExact.textContent = item.exactMatch ? "Yes" : "No";
 
@@ -149,6 +164,25 @@ function renderHistory(items, sortOrder) {
 
       tbody.appendChild(tr);
     });
+
+
+    const extraLineText = 
+      (mode === "sample") ? "Only a sample of history links is displayed, as there are too many to process. Consider adjusting your blacklist/whitelist settings to reduce the number of links." :
+      (mode === "broken") ? "Some error occured while retrieving links or history." : "History results queried with full history.";
+
+    // Create additional table row with extra info if set
+    if (extraLineText) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.style.textAlign = "center";
+      td.style.fontStyle = "italic";
+      td.style.color = (mode === "sample") ? "#ff8800" : (mode === "broken") ? "#ff4848" : "#005804";
+      td.textContent = extraLineText;
+
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
   }
 
   render();

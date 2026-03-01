@@ -7,12 +7,13 @@ html {
     width: auto;
     height: auto;
     max-width: 800px;
+    max-height: 600px;
 }
 
 body {
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    /*overflow: hidden;*/
 }
 
 .title-bar {
@@ -52,25 +53,22 @@ body {
 .content {
     flex: content;
     margin: -4px -4px;
+    overflow-y: auto;
 }
 
 .container {
     align-items: center;
     justify-content: center;
-    /*display: flex;
-    flex-direction: column;*/
     max-width: 800px;
-    max-height: 600px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    max-height: 540px;
+    overflow: hidden;
 }
 
 .content table {
     border-collapse: collapse;
-    table-layout: auto;
+    table-layout: fixed;
     font-size: 12px;
     max-width: 800px;
-    overflow: auto;
     padding: 0px 8px;
     margin: 0px 0px 0px 0px;
 }
@@ -80,11 +78,14 @@ body {
     color: white;
     font-size: 12px;
     font-weight: 600;
+    display: table;
+    width: 100%;
+    table-layout: inherit;
 }
 
 .content th {
     align-items: center;
-    text-align: left;
+    text-align: center;
     padding: 4px 8px;
 }
 
@@ -97,9 +98,16 @@ body {
 
 .content tbody {
     padding: 8px 0px 8px 0px;
+    display: block;
+    max-height: 30rem;
+    width: 100%;
+    overflow-y: auto;
 }
 
 .content tbody tr {
+    /*display: table;*/
+    /*table-layout: inherit;*/
+    width: 100%;
     border-bottom: 1px dashed navy;
     padding: 0px 8px;
     text-align: left;
@@ -112,7 +120,8 @@ body {
     max-width: 400px;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap
+    white-space: nowrap;
+    height: 1rem;
 }
 
 .loader-container {
