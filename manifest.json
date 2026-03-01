@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Amnesia",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "author": "Laurent Sarrazin",
   "homepage_url": "https://github.com/lsarrazin/amnesia",
   "browser_specific_settings": {
