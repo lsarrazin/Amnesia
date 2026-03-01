@@ -139,21 +139,21 @@ function renderHistory(historyItems, sortOrder) {
       a.textContent = item.url;
 
       const tdUrl = document.createElement("td");
-      tdUrl.style.width = "60%";
+      tdUrl.style.width = "480px";
       tdUrl.style.textAlign = "left";
       tdUrl.appendChild(a);
 
       const tdLast = document.createElement("td");
-      tdLast.style.width = "20%";
+      tdLast.style.width = "160px";
       tdLast.textContent = item.lastVisitTime ? formatDate(item.lastVisitTime) : "Never";
 
       const tdCount = document.createElement("td");
-      tdCount.style.width = "10%";
+      tdCount.style.width = "80px";
       tdCount.style.textAlign = "center";
       tdCount.textContent = String(item.visitCount);
 
       const tdExact = document.createElement("td");
-      tdExact.style.width = "10%";
+      tdExact.style.width = "80px";
       tdExact.style.textAlign = "center";
       tdExact.textContent = item.exactMatch ? "Yes" : "No";
 

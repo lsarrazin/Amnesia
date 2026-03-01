@@ -66,7 +66,7 @@ body {
 
 .content table {
     border-collapse: collapse;
-    table-layout: fixed;
+    /*table-layout: fixed;*/
     font-size: 12px;
     max-width: 800px;
     padding: 0px 8px;
@@ -86,7 +86,7 @@ body {
 .content th {
     align-items: center;
     text-align: center;
-    padding: 4px 8px;
+    padding: 4px 0px;
 }
 
 .sort-indicator {
@@ -105,8 +105,8 @@ body {
 }
 
 .content tbody tr {
-    /*display: table;*/
-    /*table-layout: inherit;*/
+    display: table;
+    table-layout: inherit;
     width: 100%;
     border-bottom: 1px dashed navy;
     padding: 0px 8px;
