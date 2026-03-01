@@ -1,0 +1,158 @@
+/* General styling */
+
+html {
+    font-family: sans-serif;
+    font-size: 12px;
+    background: transparent;
+    width: auto;
+    height: auto;
+    max-width: 800px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.title-bar {
+    background-color: royalblue;
+    color: white;
+    padding: 0px 8px;
+    margin: -8px -8px 8px -8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title-bar img {
+    margin: 0px 8px 0px 8px;
+}
+
+.title-bar p {
+    justify-content: left;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.title-bar button {
+    border: none;
+    background-color: transparent;
+    color: white;
+    font-size: 24px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    display: inline-flex;
+}
+
+.content {
+    flex: content;
+    margin: -4px -4px;
+}
+
+.container {
+    align-items: center;
+    justify-content: center;
+    /*display: flex;
+    flex-direction: column;*/
+    max-width: 800px;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.content table {
+    border-collapse: collapse;
+    table-layout: auto;
+    font-size: 12px;
+    max-width: 800px;
+    overflow: auto;
+    padding: 0px 8px;
+    margin: 0px 0px 0px 0px;
+}
+
+.content thead {
+    background-color: darkblue;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.content th {
+    align-items: center;
+    text-align: left;
+    padding: 4px 8px;
+}
+
+.sort-indicator {
+    font-size: 12px;
+    font-weight: 600;
+    align-items: center;
+    margin-left: 2px;
+}
+
+.content tbody {
+    padding: 8px 0px 8px 0px;
+}
+
+.content tbody tr {
+    border-bottom: 1px dashed navy;
+    padding: 0px 8px;
+    text-align: left;
+}
+
+.content tbody tr td {
+    padding: 0px 8px;
+    vertical-align: top;
+    text-align: center;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 80px 0px 0px 0px;
+}
+
+.loader-info {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    color: royalblue;
+    margin-top: 20px;
+    margin-bottom: 80px;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 600px;
+  height: 22px;
+  border-radius: 20px;
+  color: #5b6bff;
+  border: 2px solid;
+  position: relative;
+}
+
+.loader::before {
+  content: "";
+  position: absolute;
+  margin: 2px;
+  inset: 0 100% 0 0;
+  border-radius: inherit;
+  background: currentColor;
+  animation: l6 10s infinite;
+}
+
+@keyframes l6 {
+    100% {inset:0}
+}

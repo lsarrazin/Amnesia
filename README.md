@@ -1,5 +1,5 @@
 
-# Amnesia ![Amnsia](/icon32.png) 
+# Amnesia ![Amnsia](/ressources/dory64.png) 
 
 Firefox extension to fetch page links, then display last visit date and number of views.
 
@@ -37,8 +37,7 @@ and submit the extension to Firefox AMO
 
 from extension code folder
 ```
-web-ext build
-web-ext sign
+web-ext build --overwrite-dest
 ```
 
 This will produce the extension `.xpi` file.

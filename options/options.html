@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+
+  <div class="title-bar">
+      <img id="icon" src="../ressources/dory32.png"></img>
+      <p id="header-title">Amnesia Preferences</p>
+      <span>
+        <button id="backwards">🢨</button>
+        <button id="close">⨯</button>
+      </span>
+  </div>
+
+  <div class="tabs">
+    <div id="tabBtnGeneral" class="tab active">General</div>
+    <div id="tabBtnDomains" class="tab">Domain configuration</div>
+    <div style="flex:1"></div>
+  </div>
+
+  <div id="tab-general" class="tab-content">
+
+    <div class="section">
+      <div style="margin-bottom:12px">
+        <label for="localeSelect">Language</label>
+        <select id="localeSelect" style="margin-left:8px">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="de">Deutsch</option>
+        </select>
+        <small>
+          <br>Select the UI language for the popup display.
+        </small>
+      </div>
+    </div>
+
+    <div class="Section"></div>
+    <div style="margin-bottom:6px">
+      Default links sort option<br>
+    </div>
+    <div style="margin-bottom:12px">
+      <select id="sortOrder" style="width:100%">
+        <option value="UrlAsc" default="true">URL (A-Z)</option>
+        <option value="UrlDesc">URL (Z-A)</option>
+        <option value="DateAsc">Date (oldest)</option>
+        <option value="DateDesc">Date (newest)</option>
+        <option value="VisitsAsc">Visits (lowest)</option>
+        <option value="VisitsDesc">Visits (highest)</option>
+      </select>
+      <small><br>Set default links sorting order.</small>
+      <small><br>You can sort the links using their URLs, last visit date, or number of visits.</small>
+    </div>
+
+    <div class="section">
+      <label>
+        Maximum number of links to query <input type="number" min="1" max="500" step="1" id="urlsLimit">
+      </label>
+      <small>
+        <br>This is the number of links that will be checked when bringing up the interface.
+        <br>The higher the number, the longer the check will last.
+      </small>
+    </div>
+
+    <div class="section">
+      <label>
+        <input type="checkbox" id="useCache">
+        Use session cache to speed up URL checking.
+        <br>Limit cache size to <input type="number" min="100" max="10000" step="100" id="maxCacheSize" disabled="true">
+        links.
+      </label>
+      <br>
+      <label>
+        Current cache size: <span id="cacheSize"></span>
+        <button id="clearCache" style="margin-left:16px" disabled="true">Clear cache</button>
+      </label>
+      <small>
+        <br>If checked, use local cache to speed up URL checking.
+        <br>Any examinated link is therefore searched within a local cache before querying browser history.
+      </small>
+    </div>
+
+    <div class="section">
+      <button id="save">Save</button>
+      <button id="resetStats" style="margin-left:8px">Reset statistics</button>
+      <br>
+      <div id="status"></div>
+    </div>
+
+  </div>
+
+  <div id="tab-domains" class="tab-content hidden">
+
+    <div class="section">
+      <div style="margin-bottom:0px">
+        Domains management
+      </div>
+      <div style="margin-bottom:12px">
+        <input type="text" id="newDomainInput" placeholder="example.com" style="width:40%">
+        <button id="addDomain" style="margin-left: 8px;">Add domain</button>
+        <button id="deleteDomain" style="margin-left:8px">Delete selected</button>
+        <button id="exportDomains" style="margin-left:8px">Export domains</button>
+        <button id="importDomains" style="margin-left:8px">Import domains</button>
+        <small id="domainStatus" style="margin-left:12px;color:#666"></small>
+        <input id="importFile" type="file" accept="application/json" style="display:none">
+      </div>
+    </div>
+
+    <div class="section">
+      <div style="margin-bottom:6px">
+        Domain configuration<br>
+      </div>
+      <div style="margin-bottom:12px">
+        <select id="domainSelect" style="width:100%"></select>
+        <small>Select a domain to edit its whitelist, blacklist and inheritVisits settings. "Global" holds previous
+          global settings.</small>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>
+        <input type="checkbox" id="inheritVisits">
+        Apply a child URL's visit date to the queried URL
+      </label>
+      <small>
+        <br>If checked, when an exact URL is not found but a URL in its sub-path is found,
+        the child URL's visit date will be used for the queried URL.
+      </small>
+    </div>
+
+    <div class="section">
+      <label>Whitelist (inclusion)</label>
+      <small style="width: 60%; max-width: 60%;"><br>If at least one regex is defined here, only matching URLs will be
+        kept for the selected domain.</small>
+      <small style="float: right; width: 35%">Examples:</small>
+      <textarea style="width: 60%; max-width: 60%;" id="whitelist"></textarea>
+      <div class="example" style="float: right; width: 35%">
+        ^https://example\.com<br>/articles/<br>\.pdf$<br>^https://(www\.)?github\.com
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Blacklist (exclusion)</label>
+      <small style="width: 60%; max-width: 60%;"><br>Any URL matching these regexes will be excluded after applying the
+        whitelist for the selected domain.</small>
+      <small style="float: right; width: 35%">Examples:</small>
+      <textarea style="width: 60%; max-width: 60%;" id="blacklist"></textarea>
+      <div class="example" style="float: right; width: 35%">
+        \?utm_<br>#<br>/logout<br>\.png$<br>\.jpg$
+      </div>
+    </div>
+
+  </div>
+ 
+  <!-- tab switching handled in options.js to comply with CSP (no inline scripts) -->
+
+  <script src="options.js"></script>
+
+</body>
+
+</html>

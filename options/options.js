@@ -4,6 +4,7 @@ function normalizeDomain(s) {
   return (s || "").trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "");
 }
 
+
 function renderDomainList(domainsMap, selectedKey) {
 
   const sel = document.getElementById("domainSelect");
@@ -79,7 +80,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // backward compatibility keys
     "whitelist",
     "blacklist",
-    "inheritVisits"
+    "inheritVisits",
+    "sortOrder"
   ]);
 
   const domains = stored.domains || {};
@@ -109,6 +111,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("maxCacheSize").value = stored.maxCacheSize || 1000;
   document.getElementById("cacheSize").textContent = stored.cacheSize || 0;
   document.getElementById("urlsLimit").value = stored.urlsLimit || 100;
+  document.getElementById("sortOrder").value = stored.sortOrder || "DateDesc";
+  
 
   // Track if domain form has unsaved changes (dirty) to avoid overwriting stored domains
   let domainDirty = false;
@@ -325,6 +329,7 @@ document.getElementById("save").addEventListener("click", async () => {
     const useCache = document.getElementById("useCache").checked;
     const maxCacheSize = document.getElementById("maxCacheSize").value || 1000;
     const urlsLimit = document.getElementById("urlsLimit").value || 100;
+    const sortOrder = document.getElementById("sortOrder").value || "DateDesc";
 
     await browser.storage.local.set({
       domains: map,
@@ -332,7 +337,8 @@ document.getElementById("save").addEventListener("click", async () => {
       locale,
       useCache,
       maxCacheSize,
-      urlsLimit
+      urlsLimit,
+      sortOrder
     });
 
     document.getElementById("status").textContent = "Preferences saved.";
@@ -387,4 +393,15 @@ document.getElementById("resetStats").addEventListener("click", async () => {
   } finally {
     btn.disabled = false;
   }
+});
+
+
+// Add event listener to the back button to navigate to the previous page
+document.getElementById("backwards").addEventListener("click", () => {
+  window.location.href = "../popup/popup.html";
+});
+
+// Add event listener to the close button to close the options page
+document.getElementById("close").addEventListener("click", () => {
+  window.close();
 });

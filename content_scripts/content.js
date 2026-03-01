@@ -1,146 +1,99 @@
-browser.runtime.onMessage.addListener((message) => {
-  if (message.type === "TRIGGER_POPUP") {
-    createPopup();
+browser.runtime.onMessage.addListener(async (message) => {
+
+  if (message.command === "GET_PAGE_LINKS") {
+    return {
+      domain: getPageDomain(),
+      links: getPageLinks()
+    };
+  }
+  else if (message.command === "GET_FILTERED_LINKS") {
+    return {
+      inheritVisits: false,
+      filteredLinks: []
+    }
+  }
+  else if (message.command === "POPUP_TRIGGERED") {
+    createPopup(message.tabId);
   }
 });
 
-// TODO: make this a common.js script
-const GLOBAL_KEY = "__global__";
-
-// TODO: make this a common.js script
-function normalizeDomain(s) {
-  return (s || "").trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "");
-}
-
-
-async function getFilteringOptions() {
-
-  var rawDomain = document.location.hostname;
-
-  const domain = normalizeDomain(rawDomain);
-  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) {
-    console.error("Invalid domain name: " + rawDomain);
-    return {};
-  }
-
-  const all = await browser.storage.local.get("domains");
-  const map = all.domains || {};
-  const config = map[domain] || map[GLOBAL_KEY] || null;
-
-  const whitelistRaw = config.whitelist || [];
-  const blacklistRaw = config.blacklist || [];
-  const inheritVisits = config.inheritVisits || false;
-
-  function compile(list) {
-  return list.map(r => {
-      try {
-      return new RegExp(r);
-      } catch {
-      return null;
-      }
-  }).filter(Boolean);
-  }
-
-  const whitelist = compile(whitelistRaw);
-  const blacklist = compile(blacklistRaw);
-
-  return { whitelist: whitelist, blacklist: blacklist, inheritVisits: inheritVisits };
-}
-
-
-async function createPopup() {
-
-  const stored = await browser.storage.local.get("locale");
-
-  // --------- Récupération préférences ---------
-  const locale = stored.locale || "en";
-  const translations = {
-    en: {
-      title: `Amnesia - links found`,
-      labels: { link: "Link", lastVisit: "Last visit", visits: "Visits", exact: "Exact" },
-      querying: "Querying",
-      urlsWord: "URL",
-      estimated: "Estimated",
-      never: "Never",
-      yes: "Yes",
-      no: "No"
-    },
-    fr: {
-      title: `Amnesia - liens trouvés`,
-      labels: { link: "Lien", lastVisit: "Dernière visite", visits: "Nb visites", exact: "Exacte" },
-      querying: "Interrogation de",
-      urlsWord: "URL",
-      estimated: "Estimé",
-      never: "Jamais",
-      yes: "Oui",
-      no: "Non"
-    },
-    es: {
-      title: `Amnesia - enlaces encontrados`,
-      labels: { link: "Enlace", lastVisit: "Última visita", visits: "Visitas", exact: "Exacto" },
-      querying: "Consultando",
-      urlsWord: "URL",
-      estimated: "Estimado",
-      never: "Nunca",
-      yes: "Sí",
-      no: "No"
-    },
-    de: {
-      title: `Amnesia - gefundene Links`,
-      labels: { link: "Link", lastVisit: "Letzter Besuch", visits: "Besuche", exact: "Exakt" },
-      querying: "Abfrage",
-      urlsWord: "URL",
-      estimated: "Geschätzt",
-      never: "Nie",
-      yes: "Ja",
-      no: "Nein"
-    }
-  };
-  const t = translations[locale] || translations.en;
-
-  // --------- Collecte + déduplication robuste ---------
+function getPageLinks() {
   const links = Array.from(document.querySelectorAll("a[href]"))
     .map(a => new URL(a.href).toString());
 
-  const uniqueLinks = [...new Set(links)];
+  return [...new Set(links)];
+}
 
-  // --------- Filtrage double système ---------
-  let filteredLinks = uniqueLinks;
+function getPageDomain() {
+  return document.location.hostname;
+}
 
-  // Load configuration from current document's infered domain
-  const { whitelist, blacklist, inheritVisits } = await getFilteringOptions();
 
-  // Whitelist (si non vide)
-  if (whitelist.length > 0) {
-    filteredLinks = filteredLinks.filter(url => {
-      let res = false;
-      for (const regex of whitelist) {
-        if (regex.test(url)) {
-          res = true;
-          break;
-        }
-      }
-      return res;
-    });
+
+const translations = {
+  en: {
+    title: `Amnesia - links from`,
+    labels: { link: "Link", lastVisit: "Last visit", visits: "Visits", exact: "Exact" },
+    querying: "Querying",
+    urlsWord: "URL",
+    estimated: "Estimated",
+    never: "Never",
+    yes: "Yes",
+    no: "No"
+  },
+  fr: {
+    title: `Amnesia - liens depuis`,
+    labels: { link: "Lien", lastVisit: "Dernière visite", visits: "Nb visites", exact: "Exacte" },
+    querying: "Interrogation de",
+    urlsWord: "URL",
+    estimated: "Estimé",
+    never: "Jamais",
+    yes: "Oui",
+    no: "Non"
+  },
+  es: {
+    title: `Amnesia - enlaces encontrados`,
+    labels: { link: "Enlace", lastVisit: "Última visita", visits: "Visitas", exact: "Exacto" },
+    querying: "Consultando",
+    urlsWord: "URL",
+    estimated: "Estimado",
+    never: "Nunca",
+    yes: "Sí",
+    no: "No"
+  },
+  de: {
+    title: `Amnesia - gefundene Links`,
+    labels: { link: "Link", lastVisit: "Letzter Besuch", visits: "Besuche", exact: "Exakt" },
+    querying: "Abfrage",
+    urlsWord: "URL",
+    estimated: "Geschätzt",
+    never: "Nie",
+    yes: "Ja",
+    no: "Nein"
   }
+}
 
-  // Blacklist
-  if (blacklist.length > 0) {
-    filteredLinks = filteredLinks.filter(url => {
-      let res = true;
-      for (const regex of blacklist) {
-        if (regex.test(url)) {
-          res = false;
-          break;
-        }
-      }
-      return res;
-    });
-  }
+async function createPopup(tabId) {
 
-  // --------- UI ---------
+  const stored = await browser.storage.local.get(["locale", "sortOrder"]);
 
+  // Retrieve preferences ---------
+  const locale = stored.locale || "en";
+  const t = translations[locale] || translations.en;
+  const sortOrder = stored.sortOrder || "DateDesc";
+
+  // Collect & filter links  ---------
+  const filtered = await browser.runtime.sendMessage({
+    command: "GET_FILTERED_LINKS",
+    tabId: tabId
+  });
+  const inheritVisits = filtered.inheritVisits;
+  const filteredLinks = filtered.filteredLinks;
+  const domain = filtered.domain || getPageDomain();
+
+  // Build UI ---------
   const overlay = document.createElement("div");
+  overlay.id = "amnesia.overlay";
   overlay.style.position = "fixed";
   overlay.style.inset = "0";
   overlay.style.background = "rgba(0,0,0,0.4)";
@@ -150,6 +103,7 @@ async function createPopup() {
   overlay.style.justifyContent = "center";
 
   const popup = document.createElement("div");
+  popup.id = "amnesia.popup";
   popup.style.background = "white";
   popup.style.width = "90vw";
   popup.style.height = "90vh";
@@ -159,7 +113,7 @@ async function createPopup() {
   popup.style.flexDirection = "column";
   popup.style.padding = "8px";
   popup.style.fontFamily = "Arial";
-  popup.style.fontSize = "13px";
+  popup.style.fontSize = "12px";
   popup.style.position = "relative";
 
   const header = document.createElement("div");
@@ -175,7 +129,7 @@ async function createPopup() {
   header.style.zIndex = "3";
 
   const title = document.createElement("p");
-  title.textContent = `${t.title} (${filteredLinks.length}/${uniqueLinks.length})`;
+  title.textContent = `${t.title} ${domain}`;
   title.style.justifyContent = "center";
   title.style.margin = "0px 16px";
   title.style.fontSize = "14px";
@@ -217,6 +171,10 @@ async function createPopup() {
     if (overlay.parentNode) document.body.removeChild(overlay);
   };
 
+  overlay.addEventListener('click', ({ target }) => {
+    if (target.id === "amnesia.overlay") closeBtn.click();
+  });
+
   header.appendChild(title);
   header.appendChild(closeBtn);
 
@@ -233,6 +191,7 @@ async function createPopup() {
 
   table.style.tableLayout = "auto";
   table.style.fontSize = "12px";
+
   // Construire le header du tableau sans innerHTML
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
@@ -317,7 +276,7 @@ async function createPopup() {
   info.style.fontSize = "14px";
   info.style.color = "#2563eb";
   info.style.textAlign = "center";
-  
+
   // compute average search duration from stored stats (ms)
   const stats = await browser.storage.local.get(["stats_totalSearchTimeMs", "stats_searchCount"]);
   const totalMs = Number(stats.stats_totalSearchTimeMs || 0);
@@ -325,7 +284,7 @@ async function createPopup() {
   const avgMs = statCount > 0 ? (totalMs / statCount) : 1000;
 
   let estimatedMs = avgMs;
-  info.textContent = `${t.querying} ${filteredLinks.length} ${t.urlsWord}${filteredLinks.length > 1 ? 's' : ''}… ${t.estimated}: ${Math.ceil(estimatedMs/1000)}s`;
+  info.textContent = `${t.querying} ${filteredLinks.length} ${t.urlsWord}${filteredLinks.length > 1 ? 's' : ''}… ${t.estimated}: ${Math.ceil(estimatedMs / 1000)}s`;
 
   spinnerWrapper.appendChild(spinner);
   spinnerWrapper.appendChild(info);
@@ -362,8 +321,21 @@ async function createPopup() {
     };
   });
 
-  let sortField = "url";
-  let sortDirection = 1;
+  const sortOptions = {
+    "UrlAsc": { field: "url", direction: 1 },
+    "UrlDesc": { field: "url", direction: -1 },
+    "LastVisitAsc": { field: "lastVisitTime", direction: 1 },
+    "LastVisitDesc": { field: "lastVisitTime", direction: -1 },
+    "VisitsAsc": { field: "visitCount", direction: 1 },
+    "VisitsDesc": { field: "visitCount", direction: -1 },
+  }
+
+  let sortField = "lastVisitTime";
+  let sortDirection = -1;
+  if (sortOrder in sortOptions) {
+    sortField = sortOptions[sortOrder].field;
+    sortDirection = sortOptions[sortOrder].direction;
+  }
 
   const tbody = table.querySelector("tbody");
 
@@ -404,6 +376,7 @@ async function createPopup() {
       const tdUrl = document.createElement("td");
       tdUrl.style.padding = "0px 8px 0px 8px";
       tdUrl.style.verticalAlign = "top";
+      tdUrl.style.textAlign = "left";
 
       const a = document.createElement("a");
       a.href = d.url;
@@ -421,10 +394,10 @@ async function createPopup() {
       tdLast.style.verticalAlign = "top";
       tdLast.textContent = d.lastVisitTime ? new Date(d.lastVisitTime).toLocaleString() : t.never;
 
-
       const tdCount = document.createElement("td");
       tdCount.style.padding = "0px 8px 0px 8px";
       tdCount.style.verticalAlign = "top";
+      tdCount.style.textAlign = "center";
       tdCount.textContent = String(d.visitCount);
 
       const tdExact = document.createElement("td");
